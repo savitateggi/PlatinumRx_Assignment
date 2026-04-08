@@ -13,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck } from "lucide-react";
+import { Info } from "lucide-react";
 
 const q1_output = {
     user_id: "21wrcxuy-67erfn",
@@ -34,7 +34,7 @@ export default function DataAnalysisPage() {
                 <p className="text-muted-foreground">Query outputs based on the provided PDF data.</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                  <Card>
                     <CardHeader>
                         <CardTitle>Q1: Last Booked Room</CardTitle>
@@ -55,26 +55,6 @@ export default function DataAnalysisPage() {
                                 </TableRow>
                             </TableBody>
                         </Table>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Q2: Billing in Nov 2021</CardTitle>
-                         <CardDescription>Total billing amount for bookings in November 2021.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">No bookings found for November 2021 in the provided data.</p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Q3: Bills &gt; 1000 in Oct 2021</CardTitle>
-                        <CardDescription>Bills raised in October 2021 with an amount over 1000.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">No bills found for October 2021 in the provided data.</p>
                     </CardContent>
                 </Card>
 
@@ -106,13 +86,26 @@ export default function DataAnalysisPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle>Q5: 2nd Highest Bill</CardTitle>
-                        <CardDescription>For each month of 2021.</CardDescription>
+                        <CardTitle className="flex items-center gap-2"><Info /> Analysis Notes</CardTitle>
+                        <CardDescription>Observations from queries with limited data in the provided sample.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">Only one customer with one bill was found in the data for September 2021. Therefore, a second highest bill cannot be determined.</p>
+                    <CardContent className="pt-4">
+                        <div className="space-y-6">
+                            <div>
+                                <h4 className="font-semibold">Q2: Billing in Nov 2021</h4>
+                                <p className="text-sm text-muted-foreground">No bookings were found for November 2021 in the provided data.</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Q3: Bills &gt; 1000 in Oct 2021</h4>
+                                <p className="text-sm text-muted-foreground">No bills were found for October 2021 with an amount over 1000 in the provided data.</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Q5: 2nd Highest Bill</h4>
+                                <p className="text-sm text-muted-foreground">Only one customer with one bill was found for September 2021. Therefore, a second highest bill cannot be determined.</p>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
