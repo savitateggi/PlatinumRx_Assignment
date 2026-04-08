@@ -11,15 +11,22 @@ import { FileQuestion } from "lucide-react";
 const hotelQueries = [
     {
         id: "q1",
-        question: "Q1: Which was the last room booked?",
-        query: `SELECT room_id, booking_date
-FROM bookings
-ORDER BY booking_date DESC
-LIMIT 1;`
+        question: "Q1: For every user in the system, get the user_id and last booked room_no.",
+        query: `WITH LastBooking AS (
+    SELECT
+        guest_id,
+        room_id,
+        -- Use ROW_NUMBER to find the latest booking for each guest
+        ROW_NUMBER() OVER(PARTITION BY guest_id ORDER BY booking_date DESC) as rn
+    FROM bookings
+)
+SELECT guest_id, room_id
+FROM LastBooking
+WHERE rn = 1;`
     },
     {
         id: "q2",
-        question: "Q2: What was the total billing for November 2021?",
+        question: "Q2: Get booking_id and total billing amount of every booking created in November, 2021.",
         query: `SELECT
     b.booking_id,
     SUM(bc.quantity * i.rate) AS total_bill
@@ -31,19 +38,20 @@ GROUP BY b.booking_id;`
     },
     {
         id: "q3",
-        question: "Q3: Find all bills greater than 1000.",
+        question: "Q3: Get bill_id and bill amount of all the bills raised in October, 2021 having bill amount > 1000.",
         query: `SELECT
     b.booking_id,
     SUM(bc.quantity * i.rate) AS total_bill
 FROM bookings b
 JOIN booking_commercials bc ON b.booking_id = bc.booking_id
 JOIN items i ON bc.item_id = i.item_id
+WHERE strftime('%Y-%m', b.booking_date) = '2021-10'
 GROUP BY b.booking_id
 HAVING SUM(bc.quantity * i.rate) > 1000;`
     },
     {
         id: "q4",
-        question: "Q4: What were the most and least ordered items each month?",
+        question: "Q4: Determine the most ordered and least ordered item of each month of year 2021.",
         query: `WITH MonthlyOrders AS (
     SELECT
         strftime('%Y-%m', b.booking_date) AS month,
@@ -54,6 +62,7 @@ HAVING SUM(bc.quantity * i.rate) > 1000;`
     FROM bookings b
     JOIN booking_commercials bc ON b.booking_id = bc.booking_id
     JOIN items i ON bc.item_id = i.item_id
+    WHERE strftime('%Y', b.booking_date) = '2021'
     GROUP BY month, i.item_name
 )
 SELECT
@@ -70,23 +79,37 @@ SELECT
     order_count,
     'Least Ordered' as status
 FROM MonthlyOrders
-WHERE rank_least = 1;`
+WHERE rank_least = 1
+ORDER BY month, status;`
     },
     {
         id: "q5",
-        question: "Q5: Find the 2nd highest bill.",
-        query: `WITH RankedBills AS (
+        question: "Q5: Find the customers with the second highest bill value of each month of year 2021.",
+        query: `WITH MonthlyBills AS (
     SELECT
-        b.booking_id,
-        SUM(bc.quantity * i.rate) AS total_bill,
-        DENSE_RANK() OVER (ORDER BY SUM(bc.quantity * i.rate) DESC) as bill_rank
+        strftime('%Y-%m', b.booking_date) AS month,
+        g.name as guest_name,
+        b.guest_id,
+        SUM(bc.quantity * i.rate) AS total_bill
     FROM bookings b
+    JOIN guests g ON b.guest_id = g.id
     JOIN booking_commercials bc ON b.booking_id = bc.booking_id
     JOIN items i ON bc.item_id = i.item_id
-    GROUP BY b.booking_id
+    WHERE strftime('%Y', b.booking_date) = '2021'
+    GROUP BY month, b.guest_id, g.name
+),
+RankedBills AS (
+    SELECT
+        month,
+        guest_name,
+        guest_id,
+        total_bill,
+        DENSE_RANK() OVER (PARTITION BY month ORDER BY total_bill DESC) as bill_rank
+    FROM MonthlyBills
 )
 SELECT
-    booking_id,
+    month,
+    guest_name,
     total_bill
 FROM RankedBills
 WHERE bill_rank = 2;`
@@ -98,7 +121,7 @@ export default function HotelAnalysisPage() {
         <div className="flex flex-col h-full p-4 md:p-6 gap-6">
             <header>
                 <h1 className="text-2xl font-bold font-headline">Hotel System Analysis</h1>
-                <p className="text-muted-foreground">SQL query solutions for Part A (Questions 1-5).</p>
+                <p className="text-muted-foreground">SQL query solutions for common hotel system queries.</p>
             </header>
 
             <Card>
