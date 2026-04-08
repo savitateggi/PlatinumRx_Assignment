@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Database, Sheet, Code } from "lucide-react";
+import { Database, Sheet, Code, Hotel } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/sql-practice", label: "SQL Practice", icon: Database },
   { href: "/spreadsheet-analysis", label: "Spreadsheet Analysis", icon: Sheet },
   { href: "/python-environment", label: "Python Environment", icon: Code },
+  { href: "/hotel-analysis", label: "Hotel Analysis", icon: Hotel },
 ];
 
 export function AppSidebarNav() {
